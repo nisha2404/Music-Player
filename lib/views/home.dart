@@ -1,10 +1,12 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:music_player/constants/colors.dart';
 import 'package:music_player/constants/text_style.dart';
 import 'package:music_player/controllers/player_controller.dart';
-import 'package:music_player/views/player.dart';
+import 'package:music_player/views/player_view.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Home extends StatelessWidget {
@@ -43,30 +45,43 @@ class Home extends StatelessWidget {
                   child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
                       itemCount: snapshot.data!
-                          .where((element) => element.isMusic == true)
+                          .where((element) =>
+                              element.isMusic == true &&
+                              element.displayName.endsWith(".mp3") &&
+                              element.album != "<unknown>")
                           .toList()
                           .length,
                       itemBuilder: (context, i) {
                         final song = snapshot.data!
-                            .where((element) => element.isMusic == true)
+                            .where((element) =>
+                                element.isMusic == true &&
+                                element.displayName.endsWith(".mp3") &&
+                                element.album != "<unknown>")
                             .toList()[i];
+                        final songs = snapshot.data!
+                            .where((e) =>
+                                e.isMusic == true &&
+                                e.displayName.endsWith(".mp3") &&
+                                e.album != "<unknown>")
+                            .toList();
+
                         return Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Obx(
                               () => ListTile(
                                 onTap: () => {
-                                  Get.to(Player(data: snapshot.data!),
+                                  print(song.getMap),
+                                  Get.to(() => PlayerView(data: songs),
                                       transition: Transition.downToUp),
-                                  {
-                                    controller.playSong(
-                                        song.uri, i, snapshot.data![i])
-                                  }
+                                  // Get.to(Player(data: songs),
+                                  //     transition: Transition.downToUp),
+                                  {controller.playSong(song.uri, i, song)}
                                 },
                                 tileColor: bgColor,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
-                                title: Text(song.displayNameWOExt,
+                                title: Text(song.displayName,
                                     style: GetTextTheme.sf16Bold
                                         .copyWith(color: whiteColor)),
                                 subtitle: Text(song.artist!,

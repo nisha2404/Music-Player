@@ -6,36 +6,107 @@ import 'package:music_player/constants/colors.dart';
 import 'package:music_player/constants/text_style.dart';
 import 'package:music_player/controllers/player_controller.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:swipeable_card_stack/swipeable_card_stack.dart';
 
 class Player extends StatelessWidget {
   Player({super.key, required this.data});
   final List<SongModel> data;
 
   final controller = Get.find<PlayerController>();
+  final SwipeableCardSectionController _cardController =
+      SwipeableCardSectionController();
+
+  int counter = 4;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(),
+     
       body: Padding(
           padding: EdgeInsets.all(8.sp),
           child: Column(children: [
-            Expanded(
-                child: Obx(() => Container(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      height: 300.sp,
-                      width: 300.sp,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: QueryArtworkWidget(
-                        id: data[controller.playIndex.value].id,
-                        type: ArtworkType.AUDIO,
-                        artworkHeight: double.infinity,
-                        artworkWidth: double.infinity,
-                        nullArtworkWidget: Icon(Icons.music_note,
-                            size: 48.sp, color: whiteColor),
-                      ),
-                    ))),
+            SwipeableCardsSection(
+              cardController: _cardController,
+              context: context,
+              //add the first 3 cards
+              items: [
+                SizedBox(
+                    child: Obx(() => Container(
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          height: 300.sp,
+                          width: 300.sp,
+                          alignment: Alignment.center,
+                          decoration:
+                              const BoxDecoration(shape: BoxShape.circle),
+                          child: QueryArtworkWidget(
+                            id: data[controller.playIndex.value].id,
+                            type: ArtworkType.AUDIO,
+                            artworkHeight: double.infinity,
+                            artworkWidth: double.infinity,
+                            nullArtworkWidget: Icon(Icons.music_note,
+                                size: 48.sp, color: whiteColor),
+                          ),
+                        )))
+              ],
+              onCardSwiped: (dir, index, widget) {
+                //Add the next card
+                if (counter <= data.length) {
+                  _cardController.addItem(SizedBox(
+                      child: Obx(() => Container(
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            height: 300.sp,
+                            width: 300.sp,
+                            alignment: Alignment.center,
+                            decoration:
+                                const BoxDecoration(shape: BoxShape.circle),
+                            child: QueryArtworkWidget(
+                              id: data[controller.playIndex.value].id,
+                              type: ArtworkType.AUDIO,
+                              artworkHeight: double.infinity,
+                              artworkWidth: double.infinity,
+                              nullArtworkWidget: Icon(Icons.music_note,
+                                  size: 48.sp, color: whiteColor),
+                            ),
+                          ))));
+                  counter++;
+                }
+
+                if (dir == Direction.left) {
+                  controller.playSong(
+                      data[controller.playIndex.value + 1].uri,
+                      controller.playIndex.value + 1,
+                      data[controller.playIndex.value]);
+                  counter++;
+                } else if (dir == Direction.right) {
+                  controller.playSong(
+                      data[controller.playIndex.value - 1].uri,
+                      controller.playIndex.value - 1,
+                      data[controller.playIndex.value]);
+                  counter--;
+                }
+              },
+              enableSwipeUp: true,
+              enableSwipeDown: true,
+            ),
+
+            // Expanded(
+            // child: Obx(() => Container(
+            //       clipBehavior: Clip.antiAliasWithSaveLayer,
+            //       height: 300.sp,
+            //       width: 300.sp,
+            //       alignment: Alignment.center,
+            //       decoration: const BoxDecoration(shape: BoxShape.circle),
+            //       child: QueryArtworkWidget(
+            //         id: data[controller.playIndex.value].id,
+            //         type: ArtworkType.AUDIO,
+            //         artworkHeight: double.infinity,
+            //         artworkWidth: double.infinity,
+            //         nullArtworkWidget: Icon(Icons.music_note,
+            //             size: 48.sp, color: whiteColor),
+            //       ),
+            //     ))),
             AppServices.addHeight(12.h),
             Expanded(
                 child: Container(
@@ -89,6 +160,7 @@ class Player extends StatelessWidget {
                             children: [
                               IconButton(
                                   onPressed: () => {
+                                        _cardController.triggerSwipeLeft(),
                                         controller.playSong(
                                             data[controller.playIndex.value - 1]
                                                 .uri,
@@ -122,10 +194,14 @@ class Player extends StatelessWidget {
                                 ),
                               ),
                               IconButton(
-                                  onPressed: () => controller.playSong(
-                                      data[controller.playIndex.value + 1].uri,
-                                      controller.playIndex.value + 1,
-                                      data[controller.playIndex.value]),
+                                  onPressed: () => {
+                                        _cardController.triggerSwipeRight(),
+                                        controller.playSong(
+                                            data[controller.playIndex.value + 1]
+                                                .uri,
+                                            controller.playIndex.value + 1,
+                                            data[controller.playIndex.value])
+                                      },
                                   icon: Icon(Icons.skip_next_rounded,
                                       size: 40.sp, color: bgDarkColor)),
                             ],
