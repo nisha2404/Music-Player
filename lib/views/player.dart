@@ -23,90 +23,25 @@ class Player extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(),
-     
       body: Padding(
           padding: EdgeInsets.all(8.sp),
           child: Column(children: [
-            SwipeableCardsSection(
-              cardController: _cardController,
-              context: context,
-              //add the first 3 cards
-              items: [
-                SizedBox(
-                    child: Obx(() => Container(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          height: 300.sp,
-                          width: 300.sp,
-                          alignment: Alignment.center,
-                          decoration:
-                              const BoxDecoration(shape: BoxShape.circle),
-                          child: QueryArtworkWidget(
-                            id: data[controller.playIndex.value].id,
-                            type: ArtworkType.AUDIO,
-                            artworkHeight: double.infinity,
-                            artworkWidth: double.infinity,
-                            nullArtworkWidget: Icon(Icons.music_note,
-                                size: 48.sp, color: whiteColor),
-                          ),
-                        )))
-              ],
-              onCardSwiped: (dir, index, widget) {
-                //Add the next card
-                if (counter <= data.length) {
-                  _cardController.addItem(SizedBox(
-                      child: Obx(() => Container(
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            height: 300.sp,
-                            width: 300.sp,
-                            alignment: Alignment.center,
-                            decoration:
-                                const BoxDecoration(shape: BoxShape.circle),
-                            child: QueryArtworkWidget(
-                              id: data[controller.playIndex.value].id,
-                              type: ArtworkType.AUDIO,
-                              artworkHeight: double.infinity,
-                              artworkWidth: double.infinity,
-                              nullArtworkWidget: Icon(Icons.music_note,
-                                  size: 48.sp, color: whiteColor),
-                            ),
-                          ))));
-                  counter++;
-                }
-
-                if (dir == Direction.left) {
-                  controller.playSong(
-                      data[controller.playIndex.value + 1].uri,
-                      controller.playIndex.value + 1,
-                      data[controller.playIndex.value]);
-                  counter++;
-                } else if (dir == Direction.right) {
-                  controller.playSong(
-                      data[controller.playIndex.value - 1].uri,
-                      controller.playIndex.value - 1,
-                      data[controller.playIndex.value]);
-                  counter--;
-                }
-              },
-              enableSwipeUp: true,
-              enableSwipeDown: true,
-            ),
-
-            // Expanded(
-            // child: Obx(() => Container(
-            //       clipBehavior: Clip.antiAliasWithSaveLayer,
-            //       height: 300.sp,
-            //       width: 300.sp,
-            //       alignment: Alignment.center,
-            //       decoration: const BoxDecoration(shape: BoxShape.circle),
-            //       child: QueryArtworkWidget(
-            //         id: data[controller.playIndex.value].id,
-            //         type: ArtworkType.AUDIO,
-            //         artworkHeight: double.infinity,
-            //         artworkWidth: double.infinity,
-            //         nullArtworkWidget: Icon(Icons.music_note,
-            //             size: 48.sp, color: whiteColor),
-            //       ),
-            //     ))),
+            Expanded(
+                child: Obx(() => Container(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      height: 300.sp,
+                      width: 300.sp,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: QueryArtworkWidget(
+                        id: data[controller.playIndex.value].id,
+                        type: ArtworkType.AUDIO,
+                        artworkHeight: double.infinity,
+                        artworkWidth: double.infinity,
+                        nullArtworkWidget: Icon(Icons.music_note,
+                            size: 48.sp, color: whiteColor),
+                      ),
+                    ))),
             AppServices.addHeight(12.h),
             Expanded(
                 child: Container(
